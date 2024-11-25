@@ -17,7 +17,26 @@ class Habit:
         habit_name (str): The name of the habit to be removed. 
         Returns: None """
 
+    def log_progress (habit_name, date_logged):
+        """Logs the progress of a habit by updating its streak based on the date logged
+        Parameters:
+        habit_name (str): The name of the habit. 
+        date_logged (): The date when progress is logged.
+        Returns: None """
 
+    def display_all_habits (habit_list):
+        """Displays information for each habit in the habit list. 
+        Parameters: 
+        habit_list (list): A list of habit objects to display. 
+        Returns: None """
+
+    def show_overall_progress (habit_list):
+        """Generates and returns a progress summary for each habit in the habit list.
+        Parameters: 
+        habit_list (list): A list of habits being tracked.
+        Returns:
+        str: A formatted string summarizing the name, current streak, and longest streak for each habit, 
+        as well as an overall progress summary."""
 
 """ PLANNED UNIT TESTS:
 Our unit tests will check each method to ensure that the code works properly. First, it will check if there 
