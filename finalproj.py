@@ -136,7 +136,6 @@ def show_overall_progress(self):
 
 
 #Unit tests
-
 class TestHabitTracker(unittest.TestCase):
     def setUp(self):
         self.tracker = HabitTracker("test_habits.txt")
@@ -160,6 +159,7 @@ class TestHabitTracker(unittest.TestCase):
         self.assertEqual(habit.current_streak, 1)
 
 if __name__ == "__main__":
+    
     tracker = HabitTracker ("habits.txt")
     habit_name = input ("Enter what habit you completed today: ")
     tracker.log_progress(habit_name, datetime.now())
