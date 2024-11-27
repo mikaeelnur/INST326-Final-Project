@@ -1,4 +1,5 @@
-from datetime import datetime
+from datetime import datetime, timedelta
+import unittest
 
 class Habit:
     def __init__(self, name, goal_frequency, current_streak=0, longest_streak=0, last_logged_date=None):
@@ -152,6 +153,38 @@ class HabitTracker:
 
     return summary
 
+#Unit tests
+
+class TestHabitTracker(unittest.TestCase):
+    def setUp(self):
+        self.tracker = HabitTracker("test_habits.txt")
+        self.tracker.habit_list = []
+        self.tracker.add_habit("Go on a walk", 4)
+        self.tracker.add_habit("Read before bed", 5)
+
+    def test_add_habit(self):
+        self.tracker.add_habit("Meditate", 7)
+        self.assertEqual(len(self.tracker.habit_list), 3)
+        self.assertEqual(self.tracker.habit_list[-1].name, "Meditate")
+
+    def test_delete_habit(self):
+        self.tracker.delete_habit("Read before bed")
+        self.assertEqual(len(self.tracker.habit_list), 1)
+
+    def test_log_progress(self):
+        today - datetime.now()
+        self.tracker.log_progress("Go on a walk", today)
+        habit = next(h for h in self.tracker.habit_list if h.name=="Go on a walk")
+        self.assertEqual(habit.current_streak, 1)
+
+if __name__ == "__main__":
+    #uncomment lines to run it
+    # tracker = HabitTracker ("habits.txt")
+    # tracker.add_habit("Exercise", 5)
+    # tracker.display_all_habits()
+
+    #to run the unit tests
+    unittest.main()
 
 
 """ PLANNED UNIT TESTS:
