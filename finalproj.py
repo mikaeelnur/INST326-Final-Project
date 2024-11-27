@@ -174,6 +174,6 @@ if __name__ == "__main__":
 Our unit tests will check each method to ensure that the code works properly. First, it will check if there 
 is an existing txt file in the directory, if not, it will create a new txt file. After, we will input user 
 data like specific habits, frequency, and test the streak counter. This will test if our code is successful
-or not. From there, we will make corrections as needed.
+or not. From there, we will make corrections as needed..
 
 """
