@@ -78,24 +78,41 @@ class HabitTracker:
             if habit.name == habit_name:
                 if not isinstance(date_logged, datetime):
                     raise TypeError("date_logged must be a datetime object.")
-
+                
                 if habit.last_logged_date is None:
                     habit.current_streak = 1
                 else:
                     delta_days = (date_logged - habit.last_logged_date).days
-                    
+                    if delta_days == 1:
+                        habit.current_streak += 1
+                    elif delta_days > 1:
+                        habit.current_streak = 1
+                    else:
+                        raise ValueError("date_logged cannot be earlier than the last logged date.")
+                
+                habit.longest_streak = max(habit.longest_streak, habit.current_streak)
+                habit.last_logged_date = date_logged
+                print(f"Progress logged for habit '{habit_name}'. Current streak: {habit.current_streak}.")
+                return
+        print(f"Habit '{habit_name}' not found.")
 
-    def display_all_habits (habit_list):
+
+    def display_all_habits (self, habit_list):
         """Displays information for each habit in the habit list. 
         Parameters: 
         habit_list (list): A list of habit objects to display. 
-        Returns: None """
-
-        for habit in habit_list:
-            print(f"Habit: {habit.name}")
-            print(f"  Current Streak: {habit.current_streak}")
-            print(f"  Longest Streak: {habit.longest_streak}")
-            print()
+        Returns: None"""
+        
+        if not self.habit_list:
+            print("No habits to display.")
+        else:
+            for habit in self.habit_list:
+                print(f"Habit: {habit.name}")
+                print(f"  Goal Frequency: {habit.goal_frequency} times/week")
+                print(f"  Current Streak: {habit.current_streak}")
+                print(f"  Longest Streak: {habit.longest_streak}")
+                print(f"  Last Logged: {habit.last_logged_date}")
+                print()
 
     def show_overall_progress (habit_list):
         """Generates and returns a progress summary for each habit in the habit list.
