@@ -1,21 +1,47 @@
 from datetime import datetime
 
 class Habit:
-    def __init__(self, name, goal_frequency):
+    def __init__(self, name, goal_frequency, current_streak=0, longest_streak=0, last_logged_date=None):
         """ Initialize name, goal_frequency, current_streak, longest_streak, and last_logged_date."""
         self.name = name
         self.goal_frequency= goal_frequency
-        self.current_streak= 0
-        self.longest_streak= 0
-        self.last_logged_date= None
+        self.current_streak= current_streak
+        self.longest_streak= longest_streak
+        self.last_logged_date= last_logged_date
 
 class HabitTracker:
-    def __init__(self):
-        """ Initializes the habit tracker object with an empty list of habits."""
+    def __init__(self, file_path):
+        """ Initializes the habit tracker object with an empty list of habits and loads file for data."""
         self.habit_list = []
+        self.file_path = file_path
+        self.load_from_file()
+
+    def save_to_files(self):
+        """ Saves all habits to the file"""
+        with open(self.file_path, "w") as file:
+            for habit in self.habit_list:
+                last_logged = habit.last_logged_date.strftime("%m-%d-%Y") if habit.last_logged_date else ""
+                line = f"{habit.name}, {habit.goal_frequency}, {habit.current_streak}, {habit.longest_streak}, {last_logged} \n"
+                file.write(line)
+    
+    def load_from_file(self):
+        """Load habits from the file."""
+        try:
+            with open(self.file_path, "r") as file:
+                for line in file:
+                    parts = line.strip().split(",")
+                    name = parts [0]
+                    goal_frequency = int(parts [1])
+                    current_streak = int(parts[2])
+                    longest_streak = int(parts [3])
+                    last_logged_date= datetime.strptime(parts[4], "%m-%d-%Y") if parts[4] else None
+                    habit = Habit(name, goal_frequency, current_streak, longest_streak, last_logged_date)
+                    self.habit_list.append(habit)
+        except FileNotFoundError:
+            print(f"File '{self.file_path}' not found.")
 
     def add_habit (self, name, goal_frequency):
-        """ Creates a new habit object with the name and goal frequency, and adds it to the list.
+        """ Adds a new habit and saves it to the file.
         Parameters:  
         name (str): The name of the habit. 
         goal_frequency (int): The goal frequency for the habit, how often the habit should be completed. 
@@ -23,6 +49,7 @@ class HabitTracker:
 
         new_habit = Habit(name, goal_frequency)
         self.habit_list.append(new_habit)
+        self.save_to_file()
         print(f"Habit '{name}' added succesfully.")
 
     def delete_habit (self, habit_name):
@@ -34,6 +61,7 @@ class HabitTracker:
         for habit in self.habit_list:
             if habit.name== habit_name:
                 self.habit_list.remove(habit)
+                self.save_to_file()
                 print(f"Habit '{habit_name}' successfully removed.")
                 return
 
@@ -123,6 +151,8 @@ class HabitTracker:
     summary += f"\n\nTotal Habits: {total_habits}, Average Current Streak: {average_current_streak:.2f}"
 
     return summary
+
+
 
 """ PLANNED UNIT TESTS:
 Our unit tests will check each method to ensure that the code works properly. First, it will check if there 
