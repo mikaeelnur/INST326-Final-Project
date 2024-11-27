@@ -160,11 +160,10 @@ class TestHabitTracker(unittest.TestCase):
         self.assertEqual(habit.current_streak, 1)
 
 if __name__ == "__main__":
-    #uncomment lines to run it
-    # tracker = HabitTracker ("habits.txt")
-    # habit_name = input ("Enter what habit you completed today: ")
-    # tracker.log_progress(habit_name, datetime.now())
-    # tracker.display_all_habits()
+    tracker = HabitTracker ("habits.txt")
+    habit_name = input ("Enter what habit you completed today: ")
+    tracker.log_progress(habit_name, datetime.now())
+    tracker.display_all_habits()
 
     #to run the unit tests
     unittest.main()
