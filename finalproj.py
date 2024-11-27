@@ -154,7 +154,7 @@ class TestHabitTracker(unittest.TestCase):
         self.assertEqual(len(self.tracker.habit_list), 1)
 
     def test_log_progress(self):
-        today - datetime.now()
+        today = datetime.now()
         self.tracker.log_progress("Go on a walk", today)
         habit = next(h for h in self.tracker.habit_list if h.name=="Go on a walk")
         self.assertEqual(habit.current_streak, 1)
