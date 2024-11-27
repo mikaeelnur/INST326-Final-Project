@@ -66,44 +66,22 @@ class HabitTracker:
                 print(f"Habit '{habit_name}' successfully removed.")
                 return
 
-    def log_progress (habit_name, date_logged, habits):
-
-        """Logs the progress of a habit by updating its streak based on the date logged
+    def log_progress (self, habit_name, date_logged):
+         """Logs the progress of a habit by updating its streak based on the date logged
         Parameters:
         habit_name (str): The name of the habit. 
         date_logged (datetime): The date when progress is logged.
         habits (list): A list of habit dictionaries
         Returns: None """
-
-    habit = next((h for h in habits if h['name'] == habit_name), None)
-    
-    if not habit:
-        raise ValueError(f"Habit '{habit_name}' not found.")
-    
-    # Validate date_logged
-    if not isinstance(date_logged, datetime):
-        raise TypeError("date_logged must be a datetime object.")
-    
-
-    if habit['last_logged_date'] is None:
-
-        habit['current_streak'] = 1
-    else:
-
-        delta_days = (date_logged - habit['last_logged_date']).days
-        if delta_days == 1:
-
-            habit['current_streak'] += 1
-        elif delta_days > 1:
-
-            habit['current_streak'] = 1
-        else:
-            raise ValueError("date_logged cannot be earlier than the last logged date.")
-    
-    habit['longest_streak'] = max(habit['longest_streak'], habit['current_streak'])
-    
-    habit['last_logged_date'] = date_logged
-
+        for habit in self.habit_list:
+            if habit.name == habit_name:
+                if not isinstance(date_logged, datetime):
+                    raise TypeError("date_logged must be a datetime object.")
+                if habit.last_logged_date is None:
+                    habit.current_streak = 1
+                else:
+                    delta_days = (date_logged - habit.last_logged_date).days
+                    
 
     def display_all_habits (habit_list):
         """Displays information for each habit in the habit list. 
