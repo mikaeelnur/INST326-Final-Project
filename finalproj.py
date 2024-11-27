@@ -114,41 +114,26 @@ class HabitTracker:
                 print(f"  Last Logged: {habit.last_logged_date}")
                 print()
 
-    def show_overall_progress (habit_list):
-        """Generates and returns a progress summary for each habit in the habit list.
-        Parameters: 
-        habit_list (list): A list of habits being tracked.
-        Returns:
-        str: A formatted string summarizing the name, current streak, and longest streak for each habit, 
-        as well as an overall progress summary."""
+def show_overall_progress(self):
+        """Display a summary of overall progress across all habits."""
+        if not self.habit_list:
+            print("No habits to summarize.")
+            return
+        
+        total_habits = len(self.habit_list)
+        total_streaks = sum(habit.current_streak for habit in self.habit_list)
+        habit_summaries = [
+            f"{habit.name}: Current Streak = {habit.current_streak}, Longest Streak = {habit.longest_streak}"
+            for habit in self.habit_list
+        ]
 
-        if not isinstance(habit_list, list):
-            raise TypeError("habit_list must be a list of habit dictionaries.")
-    if not all(isinstance(habit, dict) for habit in habit_list):
-        raise ValueError("Each habit in habit_list must be a dictionary.")
+        average_streak = total_streaks / total_habits if total_habits > 0 else 0
 
+        print("\nOverall Progress Summary:")
+        print("\n".join(habit_summaries))
+        print(f"\nTotal Habits: {total_habits}")
+        print(f"Average Current Streak: {average_streak:.2f}")
 
-    total_habits = len(habit_list)
-    total_current_streak = 0
-    habit_summaries = []
-
-
-    for habit in habit_list:
-        name = habit.get('name', 'Unnamed Habit')
-        current_streak = habit.get('current_streak', 0)
-        longest_streak = habit.get('longest_streak', 0)
-
-        habit_summaries.append(f"{name}: Current Streak = {current_streak}, Longest Streak = {longest_streak}")
-        total_current_streak += current_streak
-
-
-    average_current_streak = total_current_streak / total_habits if total_habits > 0 else 0
-
- 
-    summary = "\n".join(habit_summaries)
-    summary += f"\n\nTotal Habits: {total_habits}, Average Current Streak: {average_current_streak:.2f}"
-
-    return summary
 
 #Unit tests
 
