@@ -160,7 +160,8 @@ class TestHabitTracker(unittest.TestCase):
 if __name__ == "__main__":
     #uncomment lines to run it
     # tracker = HabitTracker ("habits.txt")
-    # tracker.add_habit("Exercise", 5)
+    # habit_name = input ("Enter what habit you completed today: ")
+    # tracker.log_progress(habit_name, datetime.now())
     # tracker.display_all_habits()
 
     #to run the unit tests
