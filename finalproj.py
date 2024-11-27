@@ -67,16 +67,18 @@ class HabitTracker:
                 return
 
     def log_progress (self, habit_name, date_logged):
-         """Logs the progress of a habit by updating its streak based on the date logged
+        """Logs the progress of a habit by updating its streak based on the date logged
         Parameters:
         habit_name (str): The name of the habit. 
         date_logged (datetime): The date when progress is logged.
         habits (list): A list of habit dictionaries
         Returns: None """
+        
         for habit in self.habit_list:
             if habit.name == habit_name:
                 if not isinstance(date_logged, datetime):
                     raise TypeError("date_logged must be a datetime object.")
+
                 if habit.last_logged_date is None:
                     habit.current_streak = 1
                 else:
