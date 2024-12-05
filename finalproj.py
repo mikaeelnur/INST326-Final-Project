@@ -92,9 +92,13 @@ class HabitTracker:
                 
                 habit.longest_streak = max(habit.longest_streak, habit.current_streak)
                 habit.last_logged_date = date_logged
+                self.save_to_files()
                 print(f"Progress logged for habit '{habit_name}'. Current streak: {habit.current_streak}.")
                 return
+        
         print(f"Habit '{habit_name}' not found.")
+        goal_frequency= int(input("Enter the goal frequency for this habit (times per week: "))
+        self.add_habit(habit_name, goal_frequency)
 
 
     def display_all_habits (self, habit_list):
@@ -159,8 +163,8 @@ class TestHabitTracker(unittest.TestCase):
         self.assertEqual(habit.current_streak, 1)
 
 if __name__ == "__main__":
-    
     tracker = HabitTracker ("habits.txt")
+    
     habit_name = input ("Enter what habit you completed today: ")
     tracker.log_progress(habit_name, datetime.now())
     tracker.display_all_habits()
