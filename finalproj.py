@@ -10,18 +10,21 @@ class Habit:
         self.longest_streak= longest_streak
         self.last_logged_date= last_logged_date
 
+# This tracks a collection of habits and provides operations to manage and analyze them.
 class HabitTracker:
     def __init__(self, file_path):
         """ Initializes the habit tracker object with an empty list of habits and loads file for data."""
-        self.habit_list = []
-        self.file_path = file_path
-        self.load_from_file()
+        self.habit_list = [] # List to store Habit objects
+        self.file_path = file_path # File path for saving and loading habits
+        self.load_from_file() # Load existing habits from the file
 
     def save_to_files(self):
         """ Saves all habits to the file"""
         with open(self.file_path, "w") as file:
             for habit in self.habit_list:
+                # Format the last_logged_date if it exists, otherwise leave it blank
                 last_logged = habit.last_logged_date.strftime("%m-%d-%Y") if habit.last_logged_date else ""
+                # Write habit details to a txt file.
                 line = f"{habit.name}, {habit.goal_frequency}, {habit.current_streak}, {habit.longest_streak}, {last_logged} \n"
                 file.write(line)
     
@@ -30,15 +33,19 @@ class HabitTracker:
         try:
             with open(self.file_path, "r") as file:
                 for line in file:
+                    # Split each line to extract habit attributes
                     parts = line.strip().split(",")
-                    name = parts [0].strip()
-                    goal_frequency = int(parts [1].strip())
-                    current_streak = int(parts[2].strip())
-                    longest_streak = int(parts[3].strip())
-                    last_logged_date= datetime.strptime(parts[4].strip, "%m-%d-%Y") if parts[4].strip() else None
+                    name = parts [0]
+                    goal_frequency = int(parts [1])
+                    current_streak = int(parts[2])
+                    longest_streak = int(parts [3])
+                    # Parse the last_logged_date if it exists
+                    last_logged_date= datetime.strptime(parts[4], "%m-%d-%Y") if parts[4] else None
+                    # Create a Habit object and add it to the list
                     habit = Habit(name, goal_frequency, current_streak, longest_streak, last_logged_date)
                     self.habit_list.append(habit)
         except FileNotFoundError:
+            # Handle the case where the file doesn't exist
             print(f"File '{self.file_path}' not found.")
 
     def add_habit (self, name, goal_frequency):
@@ -48,9 +55,9 @@ class HabitTracker:
         goal_frequency (int): The goal frequency for the habit, how often the habit should be completed. 
         Returns: None """
 
-        new_habit = Habit(name, goal_frequency)
-        self.habit_list.append(new_habit)
-        self.save_to_files()
+        new_habit = Habit(name, goal_frequency) # Create a new Habit object
+        self.habit_list.append(new_habit) # Add it to the habit list
+        self.save_to_file() # Save the updated list to the file
         print(f"Habit '{name}' added succesfully.")
 
     def delete_habit (self, habit_name):
@@ -60,9 +67,9 @@ class HabitTracker:
         habit_name (str): The name of the habit to be removed. 
         Returns: None """
         for habit in self.habit_list:
-            if habit.name== habit_name:
-                self.habit_list.remove(habit)
-                self.save_to_files()
+            if habit.name== habit_name: # Find the habit by name
+                self.habit_list.remove(habit) # Remove it from the list
+                self.save_to_file() # Save the updated list to the file
                 print(f"Habit '{habit_name}' successfully removed.")
                 return
 
@@ -96,23 +103,22 @@ class HabitTracker:
                 print(f"Progress logged for habit '{habit_name}'. Current streak: {habit.current_streak}.")
                 return
         
-        print(f"Habit '{habit_name}' not found. Adding it to the tracker.")
-        goal_frequency= int(input("Enter the goal frequency for this habit (# of times per week): "))
+        print(f"Habit '{habit_name}' not found.")
+        goal_frequency= int(input("Enter the goal frequency for this habit (times per week: "))
         self.add_habit(habit_name, goal_frequency)
-        #log progress after adding the habit
-        self.log_progress(habit_name, date_logged)
 
 
-    def display_all_habits (self):
+    def display_all_habits (self, habit_list):
         """Displays information for each habit in the habit list. 
         Parameters: 
         habit_list (list): A list of habit objects to display. 
         Returns: None"""
         
-        if not self.habit_list:
+        if not self.habit_list: # Check if the list is empty
             print("No habits to display.")
         else:
             for habit in self.habit_list:
+                # Print details of each habit
                 print(f"Habit: {habit.name}")
                 print(f"  Goal Frequency: {habit.goal_frequency} times/week")
                 print(f"  Current Streak: {habit.current_streak}")
@@ -125,7 +131,8 @@ def show_overall_progress(self):
         if not self.habit_list:
             print("No habits to summarize.")
             return
-        
+            
+        # Calculate total habits and streak averages
         total_habits = len(self.habit_list)
         total_streaks = sum(habit.current_streak for habit in self.habit_list)
         habit_summaries = [
@@ -134,7 +141,7 @@ def show_overall_progress(self):
         ]
 
         average_streak = total_streaks / total_habits if total_habits > 0 else 0
-
+    # Display a summary for each habit
         print("\nOverall Progress Summary:")
         print("\n".join(habit_summaries))
         print(f"\nTotal Habits: {total_habits}")
@@ -166,13 +173,13 @@ class TestHabitTracker(unittest.TestCase):
 
 if __name__ == "__main__":
     tracker = HabitTracker ("habits.txt")
-
+    
     habit_name = input ("Enter what habit you completed today: ")
     tracker.log_progress(habit_name, datetime.now())
     tracker.display_all_habits()
 
-    #uncomment to run the unit tests
-    #unittest.main()
+    #to run the unit tests
+    unittest.main()
 
 
 """ PLANNED UNIT TESTS:
