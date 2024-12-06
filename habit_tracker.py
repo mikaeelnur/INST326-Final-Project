@@ -46,7 +46,7 @@ class HabitTracker:
                     self.habit_list.append(habit)
         except FileNotFoundError:
             # Handle the case where the file doesn't exist
-            print(f"File '{self.file_path}' not found.")
+            print(f"File '{self.file_path}' not found. Creating a new one.")
 
     def add_habit (self, name, goal_frequency):
         """ Adds a new habit and saves it to the file.
@@ -129,26 +129,26 @@ class HabitTracker:
                 print(f"  Last Logged: {habit.last_logged_date}")
                 print()
 
-def show_overall_progress(self):
-        """Display a summary of overall progress across all habits."""
-        if not self.habit_list:
-            print("No habits to summarize.")
-            return
-            
-        # Calculate total habits and streak averages
-        total_habits = len(self.habit_list)
-        total_streaks = sum(habit.current_streak for habit in self.habit_list)
-        habit_summaries = [
-            f"{habit.name}: Current Streak = {habit.current_streak}, Longest Streak = {habit.longest_streak}"
-            for habit in self.habit_list
-        ]
+    def show_overall_progress(self):
+            """Display a summary of overall progress across all habits."""
+            if not self.habit_list:
+                print("No habits to summarize.")
+                return
+                
+            # Calculate total habits and streak averages
+            total_habits = len(self.habit_list)
+            total_streaks = sum(habit.current_streak for habit in self.habit_list)
+            habit_summaries = [
+                f"{habit.name}: Current Streak = {habit.current_streak}, Longest Streak = {habit.longest_streak}"
+                for habit in self.habit_list
+            ]
 
-        average_streak = total_streaks / total_habits if total_habits > 0 else 0
-    # Display a summary for each habit
-        print("\nOverall Progress Summary:")
-        print("\n".join(habit_summaries))
-        print(f"\nTotal Habits: {total_habits}")
-        print(f"Average Current Streak: {average_streak:.2f}")
+            average_streak = total_streaks / total_habits if total_habits > 0 else 0
+        # Display a summary for each habit
+            print("\nOverall Progress Summary:")
+            print("\n".join(habit_summaries))
+            print(f"\nTotal Habits: {total_habits}")
+            print(f"Average Current Streak: {average_streak:.2f}")
 
 
 #Unit tests
@@ -192,8 +192,9 @@ if __name__ == "__main__":
         print("1. Add a new habit")
         print("2. Log progress for a habit")
         print("3. Display all habits")
-        print("4. Delete a habit")
-        print("5. Exit")
+        print("4. Show overall progress")
+        print("5. Delete a habit")
+        print("6. Exit")
 
         choice = input("Enter your choice (#): ")
 
@@ -210,9 +211,11 @@ if __name__ == "__main__":
         elif choice == "3":
             tracker.display_all_habits()
         elif choice == "4":
+            tracker.show_overall_progress()
+        elif choice == "5":
             habit_name = input("Enter the habit to delete:" )
             tracker.delete_habit(habit_name)
-        elif choice == "5":
+        elif choice == "6":
             print ("Exiting habit tracker.")
             break
         else:
