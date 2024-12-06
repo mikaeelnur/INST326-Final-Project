@@ -18,14 +18,14 @@ class HabitTracker:
         self.file_path = file_path # File path for saving and loading habits
         self.load_from_file() # Load existing habits from the file
 
-    def save_to_files(self):
+    def save_to_file(self):
         """ Saves all habits to the file"""
         with open(self.file_path, "w") as file:
             for habit in self.habit_list:
                 # Format the last_logged_date if it exists, otherwise leave it blank
                 last_logged = habit.last_logged_date.strftime("%m-%d-%Y") if habit.last_logged_date else ""
                 # Write habit details to a txt file.
-                line = f"{habit.name}, {habit.goal_frequency}, {habit.current_streak}, {habit.longest_streak}, {last_logged} \n"
+                line = f"{habit.name}, {habit.goal_frequency}, {habit.current_streak}, {habit.longest_streak}, {last_logged}\n"
                 file.write(line)
     
     def load_from_file(self):
@@ -35,12 +35,12 @@ class HabitTracker:
                 for line in file:
                     # Split each line to extract habit attributes
                     parts = line.strip().split(",")
-                    name = parts [0]
-                    goal_frequency = int(parts [1])
-                    current_streak = int(parts[2])
-                    longest_streak = int(parts [3])
+                    name = parts[0].strip()
+                    goal_frequency = int(parts [1].strip())
+                    current_streak = int(parts[2].strip())
+                    longest_streak = int(parts [3].strip())
                     # Parse the last_logged_date if it exists
-                    last_logged_date= datetime.strptime(parts[4], "%m-%d-%Y") if parts[4] else None
+                    last_logged_date= datetime.strptime(parts[4].strip(), "%m-%d-%Y") if parts[4].strip() else None
                     # Create a Habit object and add it to the list
                     habit = Habit(name, goal_frequency, current_streak, longest_streak, last_logged_date)
                     self.habit_list.append(habit)
@@ -66,12 +66,15 @@ class HabitTracker:
         habit_list (list): The list of habits. 
         habit_name (str): The name of the habit to be removed. 
         Returns: None """
+        if not self.habit_list:
+            print("No habits to delete, list is empty.")
         for habit in self.habit_list:
             if habit.name== habit_name: # Find the habit by name
                 self.habit_list.remove(habit) # Remove it from the list
                 self.save_to_file() # Save the updated list to the file
                 print(f"Habit '{habit_name}' successfully removed.")
                 return
+        print(f"Habit '{habit_name}' not found. No habits were deleted.")
 
     def log_progress (self, habit_name, date_logged):
         """Logs the progress of a habit by updating its streak based on the date logged
@@ -99,16 +102,16 @@ class HabitTracker:
                 
                 habit.longest_streak = max(habit.longest_streak, habit.current_streak)
                 habit.last_logged_date = date_logged
-                self.save_to_files()
+                self.save_to_file()
                 print(f"Progress logged for habit '{habit_name}'. Current streak: {habit.current_streak}.")
                 return
         
         print(f"Habit '{habit_name}' not found.")
-        goal_frequency= int(input("Enter the goal frequency for this habit (times per week: "))
+        goal_frequency= int(input("Enter the goal frequency for this habit (# of times per week): "))
         self.add_habit(habit_name, goal_frequency)
 
 
-    def display_all_habits (self, habit_list):
+    def display_all_habits (self):
         """Displays information for each habit in the habit list. 
         Parameters: 
         habit_list (list): A list of habit objects to display. 
@@ -164,28 +167,56 @@ class TestHabitTracker(unittest.TestCase):
     def test_delete_habit(self):
         self.tracker.delete_habit("Read before bed")
         self.assertEqual(len(self.tracker.habit_list), 1)
+        habit_names = [habit.name for habit in self.tracker.habit_list]
+        self.assertNotIn("Read before bed", habit_names)
 
     def test_log_progress(self):
         today = datetime.now()
         self.tracker.log_progress("Go on a walk", today)
         habit = next(h for h in self.tracker.habit_list if h.name=="Go on a walk")
         self.assertEqual(habit.current_streak, 1)
+        self.assertEqual(habit.last_logged_date, today)
+        self.assertEqual(habit.longest_streak, 1)
+    
+    def test_add_log_new_habit(self):
+        today= datetime.now()
+        self.tracker.log_progress("Evening meditation", today)
+        habit = next(h for h in self.tracker.habit_list if h.name == "Evening meditation")
+        self.assertEqual(habit.current_streak, 1)
+        self.assertEqual(habit.goal_frequency, 7)
 
 if __name__ == "__main__":
     tracker = HabitTracker ("habits.txt")
-    
-    habit_name = input ("Enter what habit you completed today: ")
-    tracker.log_progress(habit_name, datetime.now())
-    tracker.display_all_habits()
+    while True:
+        print("\nHabit Tracker Menu:" )
+        print("1. Add a new habit")
+        print("2. Log progress for a habit")
+        print("3. Display all habits")
+        print("4. Delete a habit")
+        print("5. Exit")
 
-    #to run the unit tests
-    unittest.main()
+        choice = input("Enter your choice (#): ")
 
+        if choice == "1":
+            habit_name = input("Enter the name of the habit: ")
+            try:
+                goal_frequency = int(input("Enter the goal frequency for this habit (times per week): "))
+                tracker.add_habit(habit_name, goal_frequency)
+            except ValueError:
+                print("Invalid input. Goal frequency must be a number.")
+        elif choice == "2":
+            habit_name = input("Enter the name of the habitat you completed today: ")
+            tracker.log_progress(habit_name, datetime.now())
+        elif choice == "3":
+            tracker.display_all_habits()
+        elif choice == "4":
+            habit_name = input("Enter the habit to delete:" )
+            tracker.delete_habit(habit_name)
+        elif choice == "5":
+            print ("Exiting habit tracker.")
+            break
+        else:
+            print("Invalid choice. Please try again with a valid option.")
 
-""" PLANNED UNIT TESTS:
-Our unit tests will check each method to ensure that the code works properly. First, it will check if there 
-is an existing txt file in the directory, if not, it will create a new txt file. After, we will input user 
-data like specific habits, frequency, and test the streak counter. This will test if our code is successful
-or not. From there, we will make corrections as needed..
-
-"""
+    #uncomment to run the unit tests
+    #unittest.main()
