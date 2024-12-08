@@ -18,7 +18,13 @@ class HabitTracker:
         self.load_from_file() # Load existing habits from the file
 
     def save_to_file(self):
-        """ Saves all habits to the file"""
+        """ Saves all habits to the file
+        Iterates through the habit list and writes each habit's details to a .txt file.
+        Parameters:
+        None
+        Returns:
+        None
+        """
         with open(self.file_path, "w") as file:
             for habit in self.habit_list:
                 # Format the last_logged_date if it exists, otherwise leave it blank
@@ -28,7 +34,16 @@ class HabitTracker:
                 file.write(line)
     
     def load_from_file(self):
-        """Load habits from the file."""
+        """Load habits from the file.
+        Reads the file line by line, extracts the habit attributes, and populates the
+        habit list with the objects.
+        Parameters:
+        None
+        Returns:
+        None
+        Raises:
+        FileNotFoundError: If the file does not exist, a message is printed and a new file is created.
+        """
         try:
             with open(self.file_path, "r") as file:
                 for line in file:
@@ -52,8 +67,8 @@ class HabitTracker:
         Parameters:  
         name (str): The name of the habit. 
         goal_frequency (int): The goal frequency for the habit, how often the habit should be completed. 
-        Returns: None """
-
+        Returns: None 
+        """
         new_habit = Habit(name, goal_frequency) # Create a new Habit object
         self.habit_list.append(new_habit) # Add it to the habit list
         self.save_to_file() # Save the updated list to the file
@@ -64,7 +79,8 @@ class HabitTracker:
         Parameters: 
         habit_list (list): The list of habits. 
         habit_name (str): The name of the habit to be removed. 
-        Returns: None """
+        Returns: None 
+        """
         if not self.habit_list:
             print("No habits to delete, list is empty.")
         for habit in self.habit_list:
@@ -81,8 +97,8 @@ class HabitTracker:
         habit_name (str): The name of the habit. 
         date_logged (datetime): The date when progress is logged.
         habits (list): A list of habit dictionaries
-        Returns: None """
-        
+        Returns: None 
+        """
         for habit in self.habit_list:
             if habit.name == habit_name:
                 if not isinstance(date_logged, datetime):
@@ -109,13 +125,12 @@ class HabitTracker:
         goal_frequency= int(input("Enter the goal frequency for this habit (# of times per week): "))
         self.add_habit(habit_name, goal_frequency)
 
-
     def display_all_habits (self):
         """Displays information for each habit in the habit list. 
         Parameters: 
         habit_list (list): A list of habit objects to display. 
-        Returns: None"""
-        
+        Returns: None
+        """
         if not self.habit_list: # Check if the list is empty
             print("No habits to display.")
         else:
@@ -129,27 +144,35 @@ class HabitTracker:
                 print()
 
     def show_overall_progress(self):
-            """Display a summary of overall progress across all habits."""
-            if not self.habit_list:
+        """Display a summary of overall progress across all habits.
+        Calculates the total number of habits, the average current streak across all the habits, and
+        individual summaries for each habit.
+        Parameters:
+        None
+        Returns:
+        None
+        """
+        if not self.habit_list:
                 print("No habits to summarize.")
                 return
                 
             # Calculate total habits and streak averages
-            total_habits = len(self.habit_list)
-            total_streaks = sum(habit.current_streak for habit in self.habit_list)
-            habit_summaries = [
-                f"{habit.name}: Current Streak = {habit.current_streak}, Longest Streak = {habit.longest_streak}"
-                for habit in self.habit_list
-            ]
+        total_habits = len(self.habit_list)
+        total_streaks = sum(habit.current_streak for habit in self.habit_list)
+        habit_summaries = [
+            f"{habit.name}: Current Streak = {habit.current_streak}, Longest Streak = {habit.longest_streak}"
+            for habit in self.habit_list
+        ]
 
-            average_streak = total_streaks / total_habits if total_habits > 0 else 0
+        average_streak = total_streaks / total_habits if total_habits > 0 else 0
         # Display a summary for each habit
-            print("\nOverall Progress Summary:")
-            print("\n".join(habit_summaries))
-            print(f"\nTotal Habits: {total_habits}")
-            print(f"Average Current Streak: {average_streak:.2f}")
+        print("\nOverall Progress Summary:")
+        print("\n".join(habit_summaries))
+        print(f"\nTotal Habits: {total_habits}")
+        print(f"Average Current Streak: {average_streak:.2f}")
 
 if __name__ == "__main__":
+
     tracker = HabitTracker ("habits.txt")
     while True:
         print("\nHabit Tracker Menu:" )
