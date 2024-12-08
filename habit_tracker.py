@@ -1,4 +1,5 @@
 from datetime import datetime, timedelta
+import sqlite3
 
 class Habit:
     def __init__(self, name, goal_frequency, current_streak=0, longest_streak=0, last_logged_date=None):
