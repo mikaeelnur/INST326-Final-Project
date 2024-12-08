@@ -3,6 +3,7 @@ How to use the habit tracker:
 - cd into file location
 - python3 habit_tracker.py
 - Follow instructions from there!
+  
 There are some important factors to remember:
 - The habits.txt file should be in the same folder as the .py file
 - If there is not an existing habits.txt file, the program will create a new one
