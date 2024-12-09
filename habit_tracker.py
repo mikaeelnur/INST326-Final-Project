@@ -82,6 +82,7 @@ class HabitTracker:
         habit_name (str): The name of the habit to be removed. 
         Returns: None 
         """
+        habit_name= habit_name.strip() #trim whitespaces
         if not self.habit_list:
             print("No habits to delete, list is empty.")
         for habit in self.habit_list:
@@ -201,7 +202,7 @@ if __name__ == "__main__":
             except ValueError:
                 print("Invalid input. Goal frequency must be a number.")
         elif choice == "2":
-            habit_name = input("Enter the name of the habitat you completed today: ")
+            habit_name = input("Enter the name of the habit you completed today: ")
             tracker.log_progress(habit_name, datetime.now())
         elif choice == "3":
             tracker.display_all_habits()
