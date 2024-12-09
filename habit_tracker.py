@@ -12,99 +12,82 @@ class Habit:
 
 # This tracks a collection of habits and provides operations to manage and analyze them.
 class HabitTracker:
-    def __init__(self, file_path):
-        """ Initializes the habit tracker object with an empty list of habits and loads file for data."""
-        self.habit_list = [] # List to store Habit objects
-        self.file_path = file_path # File path for saving and loading habits
-        self.load_from_file() # Load existing habits from the file
+    def __init__(self, db_path="habits.db"):
+        self.db_path = db_path
+        self.habit_list = []
+        self.initialize_database()
+        self.load_from_database()
 
-    def save_to_file(self):
-        """ Saves all habits to the file
-        Iterates through the habit list and writes each habit's details to a .txt file.
-        Parameters:
-        None
-        Returns:
-        None
-        """
-        with open(self.file_path, "w") as file:
-            for habit in self.habit_list:
-                # Format the last_logged_date if it exists, otherwise leave it blank
-                last_logged = habit.last_logged_date.strftime("%m-%d-%Y") if habit.last_logged_date else ""
-                # Write habit details to a txt file.
-                line = f"{habit.name}, {habit.goal_frequency}, {habit.current_streak}, {habit.longest_streak}, {last_logged}\n"
-                file.write(line)
+    def initialize_database(self):
+        """Creates the habits table if it does not exist."""
+        with sqlite3.connect(self.db_path) as conn:
+            cursor = conn.cursor()
+            cursor.execute("""
+                CREATE TABLE IF NOT EXISTS habits (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    name TEXT UNIQUE NOT NULL,
+                    goal_frequency INTEGER NOT NULL,
+                    current_streak INTEGER DEFAULT 0,
+                    longest_streak INTEGER DEFAULT 0,
+                    last_logged_date TEXT
+                )
+            """)
+
+    def load_from_database(self):
+        """Loads habits from the database."""
+        self.habit_list = []  # Clear current list
+        with sqlite3.connect(self.db_path) as conn:
+            cursor = conn.cursor()
+            cursor.execute("SELECT name, goal_frequency, current_streak, longest_streak, last_logged_date FROM habits")
+            for row in cursor.fetchall():
+                name, goal_frequency, current_streak, longest_streak, last_logged_date = row
+                last_logged_date = datetime.strptime(last_logged_date, "%Y-%m-%d") if last_logged_date else None
+                habit = Habit(name, goal_frequency, current_streak, longest_streak, last_logged_date)
+                self.habit_list.append(habit)
     
-    def load_from_file(self):
-        """Load habits from the file.
-        Reads the file line by line, extracts the habit attributes, and populates the
-        habit list with the objects.
-        Parameters:
-        None
-        Returns:
-        None
-        Raises:
-        FileNotFoundError: If the file does not exist, a message is printed and a new file is created.
-        """
-        try:
-            with open(self.file_path, "r") as file:
-                for line in file:
-                    # Split each line to extract habit attributes
-                    parts = line.strip().split(",")
-                    name = parts[0].strip()
-                    goal_frequency = int(parts [1].strip())
-                    current_streak = int(parts[2].strip())
-                    longest_streak = int(parts [3].strip())
-                    # Parse the last_logged_date if it exists
-                    last_logged_date= datetime.strptime(parts[4].strip(), "%m-%d-%Y") if parts[4].strip() else None
-                    # Create a Habit object and add it to the list
-                    habit = Habit(name, goal_frequency, current_streak, longest_streak, last_logged_date)
-                    self.habit_list.append(habit)
-        except FileNotFoundError:
-            # Handle the case where the file doesn't exist
-            print(f"File '{self.file_path}' not found. Creating a new one.")
+    def save_to_database(self, habit):
+        """Inserts or updates a habit in the database."""
+        with sqlite3.connect(self.db_path) as conn:
+            cursor = conn.cursor()
+            cursor.execute("""
+                INSERT INTO habits (name, goal_frequency, current_streak, longest_streak, last_logged_date)
+                VALUES (?, ?, ?, ?, ?)
+                ON CONFLICT(name) DO UPDATE SET
+                    goal_frequency=excluded.goal_frequency,
+                    current_streak=excluded.current_streak,
+                    longest_streak=excluded.longest_streak,
+                    last_logged_date=excluded.last_logged_date
+            """, (habit.name, habit.goal_frequency, habit.current_streak, habit.longest_streak, 
+                  habit.last_logged_date.strftime("%Y-%m-%d") if habit.last_logged_date else None))
 
-    def add_habit (self, name, goal_frequency):
-        """ Adds a new habit and saves it to the file.
-        Parameters:  
-        name (str): The name of the habit. 
-        goal_frequency (int): The goal frequency for the habit, how often the habit should be completed. 
-        Returns: None 
-        """
-        new_habit = Habit(name, goal_frequency) # Create a new Habit object
-        self.habit_list.append(new_habit) # Add it to the habit list
-        self.save_to_file() # Save the updated list to the file
-        print(f"Habit '{name}' added succesfully.")
 
-    def delete_habit (self, habit_name):
-        """ Finds a habit by name in the habit list and removes it.
-        Parameters: 
-        habit_list (list): The list of habits. 
-        habit_name (str): The name of the habit to be removed. 
-        Returns: None 
-        """
-        if not self.habit_list:
-            print("No habits to delete, list is empty.")
-        for habit in self.habit_list:
-            if habit.name== habit_name: # Find the habit by name
-                self.habit_list.remove(habit) # Remove it from the list
-                self.save_to_file() # Save the updated list to the file
+    def _add_habit(self, name, goal_frequency):
+        """Adds a new habit and saves it to the database."""
+        new_habit = Habit(name, goal_frequency)
+        self.habit_list.append(new_habit)
+        self.save_to_database(new_habit)
+        print(f"Habit '{name}' added successfully.")
+
+
+    def delete_habit(self, habit_name):
+        """Deletes a habit from the database and the habit list."""
+        with sqlite3.connect(self.db_path) as conn:
+            cursor = conn.cursor()
+            cursor.execute("DELETE FROM habits WHERE name = ?", (habit_name,))
+            if cursor.rowcount > 0:
+                self.habit_list = [h for h in self.habit_list if h.name != habit_name]
                 print(f"Habit '{habit_name}' successfully removed.")
-                return
-        print(f"Habit '{habit_name}' not found. No habits were deleted.")
+            else:
+                print(f"Habit '{habit_name}' not found.")
 
-    def log_progress (self, habit_name, date_logged):
-        """Logs the progress of a habit by updating its streak based on the date logged
-        Parameters:
-        habit_name (str): The name of the habit. 
-        date_logged (datetime): The date when progress is logged.
-        habits (list): A list of habit dictionaries
-        Returns: None 
-        """
+
+    def log_progress(self, habit_name, date_logged):
+        """Logs progress for a habit and updates the database."""
         for habit in self.habit_list:
             if habit.name == habit_name:
                 if not isinstance(date_logged, datetime):
                     raise TypeError("date_logged must be a datetime object.")
-                
+
                 if habit.last_logged_date is None:
                     habit.current_streak = 1
                 else:
@@ -115,16 +98,14 @@ class HabitTracker:
                         habit.current_streak = 1
                     else:
                         raise ValueError("date_logged cannot be earlier than the last logged date.")
-                
+
                 habit.longest_streak = max(habit.longest_streak, habit.current_streak)
                 habit.last_logged_date = date_logged
-                self.save_to_file()
+                self.save_to_database(habit)
                 print(f"Progress logged for habit '{habit_name}'. Current streak: {habit.current_streak}.")
                 return
-        
+
         print(f"Habit '{habit_name}' not found.")
-        goal_frequency= int(input("Enter the goal frequency for this habit (# of times per week): "))
-        self.add_habit(habit_name, goal_frequency)
 
     def display_all_habits (self):
         """Displays information for each habit in the habit list. 
@@ -208,4 +189,3 @@ if __name__ == "__main__":
             break
         else:
             print("Invalid choice. Please try again with a valid option.")
-
