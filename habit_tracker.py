@@ -92,12 +92,13 @@ class HabitTracker:
                 return
         print(f"Habit '{habit_name}' not found. No habits were deleted.")
 
-    def log_progress (self, habit_name, date_logged):
+    def log_progress (self, habit_name, date_logged, default_goal_frequency=None):
         """Logs the progress of a habit by updating its streak based on the date logged
         Parameters:
         habit_name (str): The name of the habit. 
         date_logged (datetime): The date when progress is logged.
         habits (list): A list of habit dictionaries
+        default_goal_frequency (int): Default goal frequency used when adding a new habit (for unit tests).
         Returns: None 
         """
         for habit in self.habit_list:
@@ -121,10 +122,16 @@ class HabitTracker:
                 self.save_to_file()
                 print(f"Progress logged for habit '{habit_name}'. Current streak: {habit.current_streak}.")
                 return
-        
+        # Add habit if it doesn't exist
         print(f"Habit '{habit_name}' not found.")
-        goal_frequency= int(input("Enter the goal frequency for this habit (# of times per week): "))
+        if default_goal_frequency is None:
+            goal_frequency= int(input("Enter the goal frequency for this habit (# of times per week): "))
+        else:
+            goal_frequency = default_goal_frequency
         self.add_habit(habit_name, goal_frequency)
+
+        # Log progress for recently added habit
+        self.log_progress(habit_name, date_logged)
 
     def display_all_habits (self):
         """Displays information for each habit in the habit list. 

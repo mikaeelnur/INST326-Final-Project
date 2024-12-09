@@ -66,10 +66,11 @@ class TestHabitTracker(unittest.TestCase):
         set to 1. Also that the goal frequency is what the user set it as.
         """
         today= datetime.now()
-        self.tracker.log_progress("Evening meditation", today)
+        self.tracker.log_progress("Evening meditation", today, default_goal_frequency=7)
         habit = next(h for h in self.tracker.habit_list if h.name == "Evening meditation")
         self.assertEqual(habit.current_streak, 1)
         self.assertEqual(habit.goal_frequency, 7)
 
+if __name__ == "__main__":
     #run the unit tests
     unittest.main()
