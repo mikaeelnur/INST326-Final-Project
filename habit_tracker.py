@@ -70,10 +70,13 @@ class HabitTracker:
         goal_frequency (int): The goal frequency for the habit, how often the habit should be completed. 
         Returns: None 
         """
+        if goal_frequency < 1 or goal_frequency > 7:
+            print("Error: Goal frequency must be between 1 and 7 (inclusive). Please try again.")
+            return
         new_habit = Habit(name, goal_frequency) # Create a new Habit object
         self.habit_list.append(new_habit) # Add it to the habit list
         self.save_to_file() # Save the updated list to the file
-        print(f"Habit '{name}' added succesfully.")
+        print(f"Habit '{name}' added successfully.")
 
     def delete_habit (self, habit_name):
         """ Finds a habit by name in the habit list and removes it.
@@ -198,7 +201,10 @@ if __name__ == "__main__":
             habit_name = input("Enter the name of the habit: ")
             try:
                 goal_frequency = int(input("Enter the goal frequency for this habit (times per week): "))
-                tracker.add_habit(habit_name, goal_frequency)
+                if 1 <= goal_frequency <= 7:
+                    tracker.add_habit(habit_name, goal_frequency)
+                else:
+                    print("Error: Goal frequency must be between 1 and 7 (inclusive). Please try again.")
             except ValueError:
                 print("Invalid input. Goal frequency must be a number.")
         elif choice == "2":
