@@ -63,17 +63,20 @@ class HabitTracker:
             # Handle the case where the file doesn't exist
             print(f"File '{self.file_path}' not found. Creating a new one.")
 
-    def add_habit (self, name, goal_frequency):
-        """ Adds a new habit and saves it to the file.
-        Parameters:  
-        name (str): The name of the habit. 
-        goal_frequency (int): The goal frequency for the habit, how often the habit should be completed. 
-        Returns: None 
-        """
-        new_habit = Habit(name, goal_frequency) # Create a new Habit object
-        self.habit_list.append(new_habit) # Add it to the habit list
-        self.save_to_file() # Save the updated list to the file
-        print(f"Habit '{name}' added succesfully.")
+def add_habit(self, name, goal_frequency):
+    """ Adds a new habit and saves it to the file.
+    Parameters:  
+    name (str): The name of the habit. 
+    goal_frequency (int): The goal frequency for the habit, how often the habit should be completed. 
+    Returns: None 
+    """
+    if goal_frequency < 1 or goal_frequency > 7:
+        print("Error: Goal frequency must be between 1 and 7 (inclusive). Please try again.")
+        return
+    new_habit = Habit(name, goal_frequency) # Create a new Habit object
+    self.habit_list.append(new_habit) # Add it to the habit list
+    self.save_to_file() # Save the updated list to the file
+    print(f"Habit '{name}' added successfully.")
 
     def delete_habit (self, habit_name):
         """ Finds a habit by name in the habit list and removes it.
